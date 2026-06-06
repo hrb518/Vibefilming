@@ -149,12 +149,14 @@ def log_seedance_call(project_id: Optional[str], detail: dict):
         pass
 
 
-def log_model_call(project_id: Optional[str], model_kind: str, detail: dict):
+def log_model_call(project_id: Optional[str], model_kind: str, detail: dict, raw_request: dict = None, raw_response: dict = None):
     """统一记录所有"调用云端模型"的请求详情，给用户做审计/复盘用。
 
     model_kind ∈ {seedream, seedance, vlm_video, vlm_image, tts, gen_bgm}
     detail 应包含：name / prompt（完整不截断）/ 关键参数（duration、ratio、ref_*、size、voice、...）
                   + result_brief（task_id 或 url 等）
+    raw_request: 实际发给 API 的原始 HTTP 请求体 (body/json)
+    raw_response: API 返回的原始 HTTP 响应体
 
     写到 logs/model_calls.jsonl。这条日志是**人类可读的全量请求**，跟
     seedance_calls.jsonl（专项 Seedance 审计）和 tool_calls.jsonl（GA 工具调用）互补。
@@ -164,11 +166,17 @@ def log_model_call(project_id: Optional[str], model_kind: str, detail: dict):
     try:
         log_path = project_dir(project_id) / "logs" / "model_calls.jsonl"
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps({
+            log_data = {
                 "ts": _now_str(),
                 "model_kind": model_kind,
                 **detail,
-            }, ensure_ascii=False, default=str) + "\n")
+            }
+            if raw_request is not None:
+                log_data["raw_request"] = raw_request
+            if raw_response is not None:
+                log_data["raw_response"] = raw_response
+                
+            f.write(json.dumps(log_data, ensure_ascii=False, default=str) + "\n")
     except Exception:
         pass
 

@@ -214,7 +214,7 @@ def _gen_image(handler, args):
         "size": size,
         "watermark": watermark,
         "result": {"path": r["path"], "url": r["url"]},
-    })
+    }, raw_request=r.get("body"), raw_response=r.get("raw"))
     return {"path": r["path"], "url": r["url"], "name": name}
 
 
@@ -331,7 +331,7 @@ def _gen_video_t2v(handler, args):
         "reference_video_url_input": ref_video_in,
         "reference_images_count": len(ref_urls),
         "reference_sources": ref_sources,
-    })
+    }, raw_request=r.get("body"), raw_response=r.get("raw"))
     return {"task_id": r["task_id"], "model": r["model"], "name": name,
             "reference_count": len(ref_urls),
             "reference_video_url": ref_video,
@@ -659,7 +659,7 @@ def _tts(handler, args):
         "text": args["text"],
         "voice": args.get("voice", "default"),
         "result": r,
-    })
+    }, raw_request=r.get("body"), raw_response=r.get("raw"))
     return r
 
 
@@ -705,7 +705,7 @@ def _gen_audio_bgm(handler, args):
         "duration": duration,
         "segments": segments,
         "enable_input_rewrite": enable_input_rewrite,
-    })
+    }, raw_request=r.get("body"), raw_response=r.get("raw"))
     return {"task_id": r["task_id"], "name": name, "duration": duration}
 
 
@@ -941,13 +941,13 @@ def _vlm_understand(handler, args):
         "via_tool": "vlm_understand",
         "name": name,
         "clip": clip,
-        "question": question,        # 完整 question 不截断
-        "answer": answer,            # 完整 answer 不截断
-        "fps": fps,
+        "question": question,
+        "answer": answer,
+        "fps": int(args.get("fps", 1)),
         "mode": args.get("mode", "auto"),
         "max_tokens": int(args.get("max_tokens", 4096)),
         "temperature": float(args.get("temperature", 0.1)),
-    })
+    }, raw_request=payload, raw_response=resp)
 
     return {"question": question, "answer": answer}
 
