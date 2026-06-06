@@ -206,7 +206,7 @@ def _gen_image(handler, args):
     save = _project_path(handler, subdir, f"{name}.png")
     save.parent.mkdir(parents=True, exist_ok=True)
     r = sdk.gen_image(prompt, save, ref_image_url=ref, size=size, watermark=watermark)
-    ws.log_model_call(_active_pid(handler), "seedream", {
+    ws.log_model_call(_active_pid(handler), sdk.MODEL_IMG, {
         "via_tool": "gen_image",
         "name": name,
         "prompt": prompt,
@@ -315,7 +315,7 @@ def _gen_video_t2v(handler, args):
         "reference_count": len(ref_urls),
         "reference_sources": ref_sources,
     })
-    ws.log_model_call(pid, "seedance", {
+    ws.log_model_call(pid, sdk.MODEL_VIDEO, {
         "via_tool": "gen_video_t2v",
         "name": name,
         "task_id": r["task_id"],
@@ -653,7 +653,7 @@ def _audio_amix(handler, args):
 def _tts(handler, args):
     save = _project_path(handler, "composed", f"{args.get('name', 'tts')}.mp3")
     r = sdk.tts(args["text"], save, voice=args.get("voice", "default"))
-    ws.log_model_call(_active_pid(handler), "tts", {
+    ws.log_model_call(_active_pid(handler), "volc-tts", {
         "via_tool": "tts",
         "name": args.get("name"),
         "text": args["text"],
@@ -665,7 +665,7 @@ def _tts(handler, args):
 
 @film_tool(
     name="gen_audio_bgm",
-    desc="豆包·音乐 GenBGM 生成纯音乐（异步，返回 task_id，需 query_audio_task 轮询）。当前需 VOLC_AK/SK，无 key 会报错。配乐流程详见 skills/skill_audio/SKILL.md",
+    desc="豆包·音乐 GenBGM 生成纯音乐（异步，返回 task_id，需 query_audio_task 轮询）。当前需在 vibefilming.config.json 配置 volc.ak / volc.sk，无 key 会报错。配乐流程详见 skills/skill_audio/SKILL.md",
     params={
         "prompt": {"type": str, "description": "音乐风格描述（自然语言写明风格/情绪/乐器/场景，建议 ≥50 字）"},
         "name": str,
@@ -697,7 +697,7 @@ def _gen_audio_bgm(handler, args):
         prompt, duration=duration, segments=segments,
         enable_input_rewrite=enable_input_rewrite,
     )
-    ws.log_model_call(pid, "gen_bgm", {
+    ws.log_model_call(pid, "volc-genbgm-v5.0", {
         "via_tool": "gen_audio_bgm",
         "name": name,
         "task_id": r["task_id"],
@@ -940,8 +940,9 @@ def _vlm_understand(handler, args):
             "clip": clip, "question": question, "answer": answer,
         }, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    ws.log_model_call(pid, "vlm_video" if is_video else "vlm_image", {
+    ws.log_model_call(pid, sdk.MODEL_VLM, {
         "via_tool": "vlm_understand",
+        "modality": "video" if is_video else "image",
         "name": name,
         "clip": clip,
         "question": question,

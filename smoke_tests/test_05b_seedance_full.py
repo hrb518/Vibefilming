@@ -39,7 +39,7 @@ def main():
     banner("Seedance 2.0 文生视频 - 完整轮询出片")
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return False
 
     model = CANDIDATE_MODELS[0]

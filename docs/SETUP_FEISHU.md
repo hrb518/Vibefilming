@@ -22,7 +22,7 @@
 
 - Python 3.8+
 - 本项目完整代码
-- LLM API 密钥（Claude/OpenAI 等，已在 `llmcore/mykeys` 中配置）
+- ARK API Key（在项目根目录 `vibefilming.config.json` 中配置 `ark.api_key`）
 
 ### 安装依赖
 
@@ -162,29 +162,27 @@ def handle(data):
 
 ### 配置飞书凭证
 
-编辑项目根目录的 `mykey.py`，添加：
+编辑项目根目录的 `vibefilming.config.json`，添加或填写：
 
-```python
-# 飞书应用凭证
-fs_app_id = "cli_xxxxxxxxxxxxxxxx"      # 替换为你的 App ID
-fs_app_secret = "xxxxxxxxxxxxxxxx"       # 替换为你的 App Secret
-
-# 允许使用的用户 Open ID 列表（可选，留空则允许所有人）
-fs_allowed_users = [
-    "ou_xxxxxxxxxxxxxxxxxxxxxxxx",       # 你的 Open ID
-]
+```json
+{
+  "feishu": {
+    "app_id": "cli_xxxxxxxxxxxxxxxx",
+    "app_secret": "xxxxxxxxxxxxxxxx",
+    "allowed_users": ["ou_xxxxxxxxxxxxxxxxxxxxxxxx"]
+  }
+}
 ```
 
 ### 确认 LLM 配置
 
-确保 `llmcore/mykeys` 中已配置 LLM API 密钥：
+确保同一个 `vibefilming.config.json` 中已配置 VibeFilming 必填的 ARK API Key：
 
-```python
-# 示例：Claude API
-claude_config = {
-    'apikey': 'sk-ant-xxxxx',
-    'apibase': 'https://api.anthropic.com',
-    'model': 'claude-sonnet-4-20250514'
+```json
+{
+  "ark": {
+    "api_key": "ark-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  }
 }
 ```
 
@@ -260,7 +258,7 @@ App ID: cli_xxxxxxxxxxxxxxxx
 
 ### Q: 提示「invalid app_id」
 
-**A:** 检查 `mykey.py` 中的 `fs_app_id` 是否正确复制（包含 `cli_` 前缀）
+**A:** 检查 `vibefilming.config.json` 中的 `feishu.app_id` 是否正确复制（包含 `cli_` 前缀）
 
 ### Q: 如何获取自己的 Open ID？
 
@@ -288,8 +286,8 @@ App ID: cli_xxxxxxxxxxxxxxxx
 
 ## 下一步
 
-- 自定义 Agent 行为：编辑 `assets/sys_prompt.txt`
-- 添加新工具：编辑 `assets/tools_schema.json`
+- 自定义 VibeFilming 行为：编辑 `assets/sys_prompt_film.txt`
+- 添加影视工具：在 `film/tools.py` 里新增 `@film_tool(...)` 函数；基础工具 schema 保留在 `assets/tools_schema_film.json`
 - 查看日志：运行时观察终端输出
 
 ---

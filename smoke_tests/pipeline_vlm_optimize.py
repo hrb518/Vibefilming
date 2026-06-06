@@ -300,7 +300,7 @@ def main():
     model_id = SEEDANCE_FAST if args.model == "fast" else SEEDANCE_STD
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return 1
 
     START = time.time()

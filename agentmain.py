@@ -6,7 +6,7 @@ if sys.stderr is None: sys.stderr = open(os.devnull, "w")
 elif hasattr(sys.stderr, 'reconfigure'): sys.stderr.reconfigure(errors='replace')
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from llmcore import reload_mykeys, ToolClient, MixinSession, NativeToolClient, NativeClaudeSession, NativeOAISession, resolve_client
+from llmcore import reload_runtime_config, ToolClient, MixinSession, NativeToolClient, NativeClaudeSession, NativeOAISession, resolve_client
 from agent_loop import agent_runner_loop
 try:
     from plugins.hooks import discover_and_load; discover_and_load()
@@ -14,24 +14,19 @@ except Exception: pass
 from ga import GenericAgentHandler, smart_format, get_global_memory, format_error, consume_file
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-GA_MODE = os.environ.get('GA_MODE', 'film')   # VibeFilming 默认就是 film 模式；'default'=回退到原版 GA
-def load_tool_schema(suffix=''):
+def load_tool_schema():
     global TOOLS_SCHEMA
-    # 默认走 film schema；外部指定 suffix（如 _cn）时走原版
-    if suffix == '' and GA_MODE == 'film':
-        suffix = '_film'
-    TS = open(os.path.join(script_dir, f'assets/tools_schema{suffix}.json'), 'r', encoding='utf-8').read()
+    TS = open(os.path.join(script_dir, 'assets/tools_schema_film.json'), 'r', encoding='utf-8').read()
     TOOLS_SCHEMA = json.loads(TS if os.name == 'nt' else TS.replace('powershell', 'bash'))
-    # film 模式：并入用 @film_tool 装饰器声明的工具 schema（自动生成，无需手写 JSON）
-    if suffix == '_film':
-        try:
-            from film.tools import build_film_schema
-            existing = {t.get('function', {}).get('name') for t in TOOLS_SCHEMA}
-            for s in build_film_schema():
-                if s.get('function', {}).get('name') not in existing:
-                    TOOLS_SCHEMA.append(s)
-        except Exception as e:
-            print(f'[WARN] film 装饰器 schema 合并失败: {e}')
+    # 并入用 @film_tool 装饰器声明的影视工具 schema（自动生成，无需手写 JSON）
+    try:
+        from film.tools import build_film_schema
+        existing = {t.get('function', {}).get('name') for t in TOOLS_SCHEMA}
+        for s in build_film_schema():
+            if s.get('function', {}).get('name') not in existing:
+                TOOLS_SCHEMA.append(s)
+    except Exception as e:
+        print(f'[WARN] film 装饰器 schema 合并失败: {e}')
 load_tool_schema()
 
 lang_suffix = '_en' if os.environ.get('GA_LANG', '') == 'en' else ''
@@ -140,11 +135,7 @@ def build_tools_index():
 
 
 def get_system_prompt():
-    # 影视模式用专属 prompt
-    if GA_MODE == 'film':
-        prompt_path = os.path.join(script_dir, 'assets/sys_prompt_film.txt')
-    else:
-        prompt_path = os.path.join(script_dir, f'assets/sys_prompt{lang_suffix}.txt')
+    prompt_path = os.path.join(script_dir, 'assets/sys_prompt_film.txt')
     with open(prompt_path, 'r', encoding='utf-8') as f: prompt = f.read()
     # 自动聚合 skills/ frontmatter 生成路由表，替换占位符
     if '{{SKILLS_INDEX}}' in prompt:
@@ -170,12 +161,12 @@ class GenericAgent:
         self.load_llm_sessions()
 
     def load_llm_sessions(self):
-        mykeys, changed = reload_mykeys()
+        runtime_config, changed = reload_runtime_config()
         if not changed and hasattr(self, 'llmclients'): return
         try: oldhistory = self.llmclient.backend.history
         except: oldhistory = None
         llm_sessions = []
-        for k, cfg in mykeys.items():
+        for k, cfg in runtime_config.items():
             if not any(x in k for x in ['api', 'config', 'cookie']): continue
             try:
                 if 'mixin' in k: llm_sessions += [{'mixin_cfg': cfg}]
@@ -198,11 +189,9 @@ class GenericAgent:
         lastc = self.llmclient
         self.llmclient = self.llmclients[self.llm_no]
         try: self.llmclient.backend.history = lastc.backend.history
-        except: raise Exception('[ERROR] BAD Mixin config: Check your mykey.py')
+        except: raise Exception('[ERROR] BAD Mixin config: Check vibefilming.config.json')
         self.llmclient.last_tools = ''
-        name = self.get_llm_name(model=True)
-        if 'glm' in name or 'minimax' in name or 'kimi' in name: load_tool_schema('_cn')
-        else: load_tool_schema()
+        load_tool_schema()
     def list_llms(self): 
         self.load_llm_sessions()
         return [(i, self.get_llm_name(b), i == self.llm_no) for i, b in enumerate(self.llmclients)]
@@ -253,13 +242,11 @@ class GenericAgent:
             sys_prompt = get_system_prompt() + getattr(self.llmclient.backend, 'extra_sys_prompt', '')
             if self.peer_hint: sys_prompt += f"\n[Peer] 用户提及其他会话/后台任务状态时: temp/model_responses/ (只找近期修改的文件尾部)\n"
             handler = GenericAgentHandler(self, self.history, os.path.join(script_dir, 'temp'))
-            # 影视模式：注入 26 个 film 工具到 handler
-            if GA_MODE == 'film':
-                try:
-                    from film.tools import inject_film_tools
-                    inject_film_tools(handler)
-                except Exception as e:
-                    print(f'[WARN] film tools 注入失败: {e}')
+            try:
+                from film.tools import inject_film_tools
+                inject_film_tools(handler)
+            except Exception as e:
+                print(f'[WARN] film tools 注入失败: {e}')
             if self.handler and 'key_info' in self.handler.working: 
                 ki = re.sub(r'\n\[SYSTEM\] 此为.*?工作记忆[。\n]*', '', self.handler.working['key_info'])  # 去旧
                 handler.working['key_info'] = ki
@@ -308,14 +295,7 @@ if __name__ == '__main__':
     parser.add_argument('--llm_no', type=int, default=0)
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument('--nobg', action='store_true')
-    parser.add_argument('--mode', choices=['default', 'film'], default=os.environ.get('GA_MODE', 'film'),
-                        help='film=影视编辑（VibeFilming 默认，加载 30 个工具）/ default=回退到原版 GA')
     args, _unknown = parser.parse_known_args()
-    # 把 --mode 同步到环境变量 + 模块级 GA_MODE，并热加载 schema/prompt
-    if args.mode != GA_MODE:
-        os.environ['GA_MODE'] = args.mode
-        globals()['GA_MODE'] = args.mode
-        load_tool_schema()
     _reflect_args = dict(zip([k.lstrip('-') for k in _unknown[::2]], _unknown[1::2])) if _unknown else {}
 
     if args.task and not args.nobg:
@@ -400,8 +380,8 @@ if __name__ == '__main__':
             try: model = agent.get_llm_name(model=True) or '?'
             except Exception: model = '?'
             try:
-                sys.stdout.write(f'\x1b[92m✦\x1b[0m \x1b[1m{"VibeFilming" if GA_MODE == "film" else "GenericAgent"}\x1b[0m '
-                                 f'\x1b[90m· cli · mode:\x1b[0m {GA_MODE} \x1b[90m· model:\x1b[0m {model}\n')
+                sys.stdout.write(f'\x1b[92m✦\x1b[0m \x1b[1mVibeFilming\x1b[0m '
+                                 f'\x1b[90m· cli · model:\x1b[0m {model}\n')
                 sys.stdout.flush()
             except Exception: pass
         while True:

@@ -1,85 +1,133 @@
 <div align="center">
 
-# 🎬 VibeFilming
+# VibeFilming
 
-### 一句 Brief，一部短片。AI 导演自己分镜、自己出片、自己审、自己改。
+### 只要一句话，脑洞变大片 🎬
 
-**你只管说一句话——「给我做个 30 秒校园霸凌警示公益片」**
-**它做：分镜 → 出图 → 出视频 → VLM 审片 → 拼片 → 配 BGM → 交付**
+**以前做短片，你要懂运镜、学写复杂的指令代码、还得自己熬夜剪辑。
+现在，你只要会说话就行。**
 
-*能自主决策的 AI 导演 · 分层架构（内核 + 技能库）· 自审重做 + 越拍越聪明 · ARK + BigMusic 双引擎*
+> "做一条 30 秒宠物公益短片，温暖一点，最后有领养呼吁。"
 
-<sub>没有写死的工作流——它自己判断怎么拍、自己审片不行就重做、把每次踩的坑沉淀成能力。脑子越用越好使。</sub>
+VibeFilming 会自己拆镜头、出参考图、拍视频、自己审片、不过审重做、拼成完整短片，最后丢给你一个 mp4。
+你只需要坐在沙发上等它交作业。
+
+**必填配置只有一个：火山方舟 ARK API Key。**
+彻底告别"一个功能配一个 key"——Agent 思考、审片、出图、出视频，全都走这一把钥匙。
+其他？选填就好，不填也能跑。
+
+<sub>不是一锤子生成视频的脚本，而是会自审、会返工、会越用越聪明的 AI 导演。</sub>
 
 ---
 
-🎨 Seedream 4.5 出图　🎬 Seedance 2.0 出视频　👁️ Seed 2.0 当导演审片　🎵 BigMusic 自主配乐
+会分镜 · 会自审 · 会返工 · 会并行加速 · 只填一把钥匙
 
 </div>
 
 ---
 
-## ✨ 它能做什么
+## 为什么值得用
 
-| 你说一句 | 它干这些活 |
-|---|---|
-| "做个 30s 公益小视频" | 分镜（4 镜）→ 4 个角色档案 → 4 段视频 → 拼片 → 暖色 BGM → 交付 mp4 |
-| "宠物跳舞 15 秒，竖屏" | 分镜（3 镜）→ 萌宠 turnaround 基准图 → 3 段动态 → 9:16 竖屏拼接 → 欢快电子 BGM |
-| "武侠片 60s，刀光剑影" | 分镜（5 镜）→ 主角三视图 + 兵器立绘 → 5 段链式承接 → 概念片节奏 BGM |
-| "30s 海边温情" | 自动判断不需要对白 → 海浪原生音 + 钢琴铺底 BGM |
-| **"30s 咖啡广告，并行出片"** | **九宫格关键帧法**：一次性出 N 张关键帧 → 多段视频并行提交 → 全过审拼片 |
+**1. 从"出一段"升级到"出一部"**
 
-**全程不需要你介入**——它会自己想分镜、自己写 prompt、自己审片不过审就重做、自己判断需不需要 BGM 配什么风格的 BGM。
+现在爆火的 AI 视频模型很强，但大多停在"给一句话 → 吐一段"。真正要做完一条短片，还要拆镜头、保证角色别变脸、让镜头衔接自然、审片、返工、拼接、配乐。VibeFilming 把这一切交给 Agent 自己搞定。
 
-> 📖 **第一次用？先看 [DIRECTOR_GUIDE.md](./DIRECTOR_GUIDE.md)**——给导演看的人话手册：每个工具干嘛用、想改它的拍法去改哪个文件、0 代码加新技能。
+**2. 告别玄学，你不用再学怎么写提示词 (Prompt)**
 
-**你只在两种情况下被打扰**：①brief 实在没说清 ②预算烧到一半还没出片需要确认。
+图像制作和影视生成都经过了系统化的内置优化。你不用去背什么"大师级 prompt"，也不用纠结参数怎么调。你只需要用最简单的大白话描述画面，系统会自动把你的大白话转换成最专业的工程化指令。
+
+**3. 它不是死板的流水线，它会做导演该做的决策**
+
+传统工具只会"按你写的提示词生成"。VibeFilming 会自己拆镜头、判断先做角色还是先做场景、决定串行还是并行，审到不对还会自己跳回去重做。
+
+**4. 它会自己审自己，不过审就改**
+
+每张参考图、每段视频、每版成片，都会进 AI 审核。审核不是简单问"对不对"，而是让它以导演视角挑毛病——主角对不对、动作自不自然、镜头衔接有没有断裂。过了才往下走。
+
+**5. 角色一致性不再是开盲盒**
+
+角色先出白底三视图，场景和道具先建视觉参考。拍视频时用上一段视频做链式承接，减少跨镜头变脸、变物、变场景。
+
+**6. 长视频可以并行拍，不用一段段傻等**
+
+多个镜头的视频片段可以同时提交，不必一段等一段。原来要两三个小时的长视频，并行后通常压到半个多小时就搞定。
+
+**7. 配置极简，只填一把 key 就能跑**
+
+必填只需要一个火山方舟 `ark.api_key`。不用研究"哪个功能对应哪家厂商"。音乐 key 是选填，不填也能完成分镜、出图、出视频、审片和拼接。
+
+## 你可以拿它做什么
+
+| 场景 | 你可以这样说 | 它会做什么 |
+|---|---|---|
+| 公益短片 | "做一条 30 秒垃圾分类公益片，要温暖、有记忆点" | 自动拆成多镜头故事，生成角色/场景参考，拍摄、审片、拼成完整 mp4 |
+| 产品广告 | "给一款冷萃咖啡做 15 秒竖屏广告，适合投小红书" | 按广告节奏设计镜头，突出产品卖点，生成竖屏短片 |
+| 短剧感内容 | "做一个雨夜重逢的 30 秒情绪短片，电影感强一点" | 建人物三视图，控制镜头氛围，串联多段视频保持角色一致 |
+| IP / 角色展示 | "让这只橘猫成为主角，做一个萌宠领养宣传片" | 先锁定角色视觉，再围绕同一主体生成多镜头故事 |
+| 概念片 / 世界观 | "做一段科幻武侠预告，刀光、雨夜、霓虹城市" | 用视觉参考 + 链式承接维持风格，合成概念预告片 |
+
+**你给方向，它负责执行。**
+它会自己想分镜、自己写提示词、自己审片，不过审就重做，还会自己判断要不要加 BGM、配什么风格。
+
+> 📖 **第一次用？先看 [DIRECTOR_GUIDE.md](./DIRECTOR_GUIDE.md)**——给导演看的人话手册：每个工具干嘛用、想改拍法去改哪个文件、0 代码加新技能。
+
+**你只在两种情况下被打扰**：①需求实在没说清 ②预算烧到一半还没出片需要确认。
 
 ---
 
 ## 🔥 凭什么它能"自主"？
 
-**关键不在工具多，而在架构——我们没用任何写死的工作流编排，而是把"决策"和"知识"分开放：**
+**关键不在工具多，而在架构——我们没有写死任何流程，而是让 Agent 自己判断下一步该干嘛：**
 
-- **决策内核**：一个能调工具、会循环、能自审、能记账的 agent 主循环——它负责"想下一步该干嘛"，但流程不钉死，可以根据审片反馈随时跳回重做 / 换思路。
-- **技能库（`skills/` + sys_prompt 铁律 + `film` 工具）**：把"怎么当导演拍片"的全部 know-how 沉淀成一篇篇 `SKILL.md`，内核按需读取、自己判断该用哪条。
+- **VibeFilming 运行内核**：一个能调工具、会循环、能自审、能记账的 Agent 主循环——它负责"想下一步该干嘛"，但流程不钉死，可以根据审片反馈随时跳回重做 / 换思路。
+- **技能库（`skills/` + 核心纪律 + `film` 工具）**：把"怎么当导演拍片"的全部经验沉淀成一篇篇 `SKILL.md`，内核按需读取、自己判断该用哪条。
 
-> **内核负责"判断"，技能库负责"经验"。** 没有流程图、没有 if-else 编排——agent 自己读经验、自己拿主意。**改拍法 = 改 md，不碰一行代码。**
+> **内核负责"判断"，技能库负责"经验"。** 没有流程图、没有 if-else 编排——Agent 自己读经验、自己拿主意。**改拍法 = 改 md，不碰一行代码。**
 
-这套架构让它真的像个导演而非流水线，靠的是下面三件事：
+这套架构让它真的像个导演而非流水线，靠的是下面几件事：
 
-### 1. 「导演式自审」 —— 每个产物 VLM 当导演审一眼
+### 1. 「导演式自审」 —— 每个产物 AI 当导演审一眼
 
-不是 QA 验收题（"是否符合 A+B+C+D"），而是导演审美题（"作为这部片的导演你看上了哪些点 / 你觉得哪里不对"）。
+不是考试打分题（"是否符合 A+B+C+D"），而是导演审美题（"作为这部片的导演，你看上了哪些点？你觉得哪里不对？"）。
 
 ```
 ✅ 过审 → 进下一步
-❌ 不过审 → 给"导演视角的问题诊断+想要的样子" → agent 走 PE 7 步翻译成合规 prompt → 重做（最多 2 轮）
+❌ 不过审 → 给"导演视角的问题诊断+想要的样子" → Agent 翻译成合规指令 → 重做（最多 2 轮）
 ```
 
 按产物类型分 **A 基准图 / B 单镜头 / C 全片成片** 三套模板，每套都有专属的导演关注重心。
 
-### 2. 「Prompt Engineering 7 步 + 5 大死罪」—— prompt 不是 prompt 是工程产物
+### 2. 「内置指令工程」—— 你不用学写 prompt，它帮你写
 
-每次喂给 Seedance/Seedream 之前，agent 必须按 PE checklist 过 7 步：任务类型 / 主体定义 / 动态顺序 / 4 类符号 / BGM 闸门 / 时长比例 / 反例扫描。**5 大死罪一个都不许踩**：
+每次喂给视频/生图模型之前，Agent 会自动按内部标准过 7 步：任务类型 / 主体定义 / 动态顺序 / 4 类符号 / BGM 闸门 / 时长比例 / 反例扫描。
+
+**也就是说，你不用学怎么写 prompt，也不用背什么技巧。你只要用最简单的人话描述你想要的画面，系统已经内置了专业的 prompt 优化策略，自动把你的大白话转成模型最能理解的工程化 prompt。** 5 大死罪它帮你自动规避：
 
 | # | 死罪 | 翻车现场 |
 |---|---|---|
 | 1 | ≥3 主体未定义 | 三个垃圾桶分不清谁是谁 |
 | 2 | 主体特征定后变 | 「红裙女孩」开头红裙结尾蓝裙 |
-| 3 | 多素材未绑定 | 「老奶奶 + 小女孩 + 垃圾桶」三视图但 prompt 只写「老奶奶」 |
+| 3 | 多素材未绑定 | 「老奶奶 + 小女孩 + 垃圾桶」三视图但指令只写「老奶奶」 |
 | 4 | 描述顺序乱 | 主体写在镜头之前，画面歪 |
-| 5 ⭐ | **张嘴无声** | 写「老奶奶夸奖」没补 `{真棒！}` → 演员张嘴没声音演哑剧 |
+| 5 | **张嘴无声** | 写「老奶奶夸奖」没补 `{真棒！}` → 演员张嘴没声音演哑剧 |
 
-### 3. 「BGM 必须走后期」—— Seedance 不脑补 BGM
+### 3. 「九宫格参考 + 并行出片」—— 长视频不必一段段傻等
+
+视频片段生成时，每个镜头都会引用分镜九宫格/关键帧图片作为参考。这相当于先给模型一张"导演分镜草图"，再让它把草图拍成动态视频，能显著降低画面跑偏。
+
+如果描述里包含对话，必须明确写出谁在说话，比如"女孩说：{我们一起带它回家吧}"，避免模型只看到台词却不知道谁在张嘴。
+
+对于多镜头切换型短片，VibeFilming 可以把多个镜头同时提交给视频模型。原来 5-8 段长视频串行生成可能要两三个小时；并行后通常可以压到半个多小时，尤其适合广告、公益片、口播外的多镜头内容。
+
+### 4. 「BGM 必须走后期」—— 视频模型不脑补 BGM
 
 | 约束 | 机制 |
 |---|---|
 | 默认值 | `generate_audio=False`，模型完全不出音轨 |
-| prompt 纪律 | 禁止写`（轻快 BGM）`/`配乐：xxx`；环境音改写成 `<音效>`（由 skill_audio / skill_prompt_engineering 约束 agent 自觉遵守） |
-| 开音轨场景 | 必须出原生对白唇形时才开 `generate_audio=True`，并在 prompt 末尾追加"无背景音乐，仅保留环境音效与人物对白" |
+| 纪律 | 禁止写`（轻快 BGM）`/`配乐：xxx`；环境音改写成 `<音效>`（由技能文档约束 Agent 自觉遵守） |
+| 开音轨场景 | 必须出原生对白唇形时才开 `generate_audio=True`，并在末尾追加"无背景音乐，仅保留环境音效与人物对白" |
 
-**整片 BGM 的唯一入口** = 流水线最后一步的 `gen_audio_bgm`（火山 BigMusic GenBGM v5.0），由 agent 自主判断要不要配 + 配什么风格。
+**整片 BGM 的唯一入口** = 流水线最后一步的音频生成工具（火山 BigMusic GenBGM v5.0），由 Agent 自主判断要不要配 + 配什么风格。
 
 ---
 
@@ -89,7 +137,7 @@
 
 ### 1. 分层记忆：拍完一次，长一次记性
 
-任务收尾时 agent 调 `start_long_term_update`，把这次**验证成功**的经验蒸馏进一套四层记忆：
+任务收尾时 Agent 会把这次**验证成功**的经验蒸馏进一套四层记忆：
 
 ```
 L1 极简索引（≤30 行，场景关键词→定位）
@@ -98,47 +146,82 @@ L3 任务级 SOP（特定任务的隐藏前置 + 典型坑）
 L4 历史会话（原始上下文，可回溯）
 ```
 
-> 铁律 **「No Execution, No Memory」**——只有真正跑通的工具结果才准进记忆，杜绝把模型的猜测当事实写进去。决策前先查记忆、反复失败回看 SOP，于是同一个坑不会踩第二次。
+> 铁律 **「没有执行就没有记忆」**——只有真正跑通的结果才准进记忆，杜绝把猜测当事实写进去。决策前先查记忆、反复失败回看 SOP，于是同一个坑不会踩第二次。
 
 ### 2. 技能库踩坑沉淀：把"翻过的车"写进剧本
 
-每个 `SKILL.md` 里都挂着真实的 **「已踩坑」案例**（带项目 id，如 `p20260601_133747_ 跳舞项目`：成片命名含糊导致跳过 BGM 直接交付）。失败现场 → 复盘 → 写进对应 skill → 下次开机自动加载，从此规避。
+每个 `SKILL.md` 里都挂着真实的 **「已踩坑」案例**（带项目 id）。失败现场 → 复盘 → 写进对应文档 → 下次开机自动加载，从此规避。
 
-> 这意味着**进化是开放的**：你（导演）或 agent 发现新坑，只要在 `skills/` 下新建一个文件夹 + `SKILL.md`（YAML frontmatter 写 `name` + `description`），**0 代码、下次对话即生效**——能力库越用越厚。
+> 这意味着**进化是开放的**：你或 Agent 发现新坑，只要在 `skills/` 下新建一个文件夹 + `.md` 文件，**0 代码、下次对话即生效**——能力库越用越厚。
 
 ---
 
-## 🚀 三步跑起来
+## 三步跑起来
 
-### 1. 装环境
+### 1. 安装
 
 ```bash
 bash setup.sh
 ```
 
-脚本会：检查 Python 3.11/3.12 → 建 `.venv` → 装依赖 → 复制 `mykey.example.py` → `mykey.py`。
+脚本会：检查 Python 3.11/3.12 → 建 `.venv` → 装依赖 → 复制 `vibefilming.config.example.json` → `vibefilming.config.json`。
 
-### 2. 填 API key
+### 2. 填配置
 
-编辑 [mykey.py](./mykey.py)：
+编辑 `vibefilming.config.json`：
 
-**必填** —— 豆包 ARK（出图/出视频/VLM 审片）：
-```python
-'apikey': 'ark-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX',
-```
+**必填只有一个：火山方舟 ARK API Key**
 
-**可选** —— 火山 BigMusic（自动配 BGM）：
-```python
-volc_open_api_config = {
-    'VOLC_AK': 'AKLT...',
-    'VOLC_SK': '...==',
-    ...
+这个 Key 同时覆盖：
+
+- Agent 自己思考和选择工具
+- AI 审图 / 审视频 / 审成片
+- 出参考图
+- 出视频
+
+也就是说，不再要求你理解"哪个功能对应哪个厂商、哪个模型再配哪个 key"。主链路统一交给火山引擎：填一次 `ark.api_key`，就能跑完整短片制作流程。
+
+```json
+{
+  "ark": {
+    "api_key": "ark-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "api_base": "https://ark.cn-beijing.volces.com/api/v3",
+    "models": {
+      "text": "doubao-seed-2-0-pro-260215",
+      "vlm": "doubao-seed-2-0-pro-260215",
+      "image": "doubao-seedream-4-5-251128",
+      "video": "doubao-seedance-2-0-260128"
+    }
+  }
 }
 ```
 
-不填 BigMusic 也能跑，只是不能自动配 BGM（手动塞 mp3 走 `audio_amix` 也行）。
+**可选：火山 BigMusic 配乐**
 
-详细开通流程见 [mykey.example.py](./mykey.example.py) 里的注释。
+不填也能跑完整视频链路，只是不会自动生成整片 BGM。
+
+```json
+{
+  "volc": {
+    "ak": "AKLT...",
+    "sk": "...=="
+  }
+}
+```
+
+**想换模型**
+
+直接改同一个配置文件里的 `ark.models`。例如想把 Seedream 4.5 换成你已开通的 Seedream 5.0 lite，就改：
+
+```json
+{
+  "ark": {
+    "models": {
+      "image": "你的-seedream-5-0-lite-模型ID"
+    }
+  }
+}
+```
 
 ### 3. 启动
 
@@ -147,7 +230,7 @@ source .venv/bin/activate
 python3 agentmain.py
 ```
 
-进 REPL 后直接说人话：
+进控制台后直接说人话：
 
 ```
 > 给我做一段关于宠物的温情小视频
@@ -162,24 +245,24 @@ python3 agentmain.py
 ## 🎞️ 端到端工作流
 
 ```
-你的 brief
+你的需求 (brief)
     ↓
-[阶段 1] 规划镜头（agent 自己拍板）
-         └─ 先 file_write 写 storyboard.json，再按片子类型选出片路线（skill_storyboard）：
+[阶段 1] 规划镜头（Agent 自己拍板）
+         └─ 先写 storyboard.json，再按片子类型选出片路线：
             · 链式承接（连续动作/长镜头）→ 串行，连贯性强
             · 关键帧并行（镜头切换型）→ 图/视频并行提交，速度快
     ↓
-[阶段 2] 用 gen_image 出角色/道具/场景的参考图
-         └─ 每张参考图必过 vlm_understand（导演审片），记住「主体名 → url」
+[阶段 2] 出角色/道具/场景的参考图
+         └─ 每张参考图必过 AI 审片，记住特征
     ↓
-[阶段 3] 每个 shot：PE 7 步 → gen_video_t2v → query_video_task
+[阶段 3] 每个镜头：自动生成专业指令 → 生成视频 → 查询状态
          └─ 链式路线串行承接 / 九宫格路线并行提交
-         └─ 每段必过 vlm_understand（不过审就重做，最多 2 轮）
+         └─ 每段必过 AI 审片（不过审就重做，最多 2 轮）
     ↓
-[阶段 4] 所有 shot 全过审 → video_concat → final_no_bgm.mp4
+[阶段 4] 所有镜头全过审 → 拼接 → 无 BGM 最终版
     ↓
-[阶段 5] 🎵 agent 自主决策要不要 BGM、配什么风格
-         └─ gen_audio_bgm → query_audio_task → audio_amix → review_final_with_bgm
+[阶段 5] 🎵 Agent 自主决策要不要 BGM、配什么风格
+         └─ 生成 BGM → 查询状态 → 混音 → 最终带 BGM 成片
     ↓
 [阶段 6] 🎁 交付 final.mp4
 ```
@@ -190,13 +273,13 @@ python3 agentmain.py
 
 ```
 projects/<project_id>/
-├── manifest.json          ← 项目元信息 / 预算 / 状态
+├── manifest.json          ← 项目状态记录
 ├── entities/              ← 角色/道具/场景基准图
-├── shots/                 ← 每个 shot 的 mp4 + 关键帧
+├── shots/                 ← 每个镜头的 mp4 + 关键帧
 ├── composed/
 │   └── final_xxx.mp4      ← ⭐ 最终交付
 ├── audios/                ← BGM mp3
-├── reviews/               ← 每次 VLM 导演审片的问答记录（json）
+├── reviews/               ← 每次 AI 审片的问答记录（json）
 └── logs/
     └── tool_calls.jsonl   ← 完整工具调用日志（含烧钱总账）
 ```
@@ -208,41 +291,35 @@ projects/<project_id>/
 | 类别 | 工具 |
 |---|---|
 | 🗂️ 工作区 | `project_create` / `project_open` |
-| 🎭 主体参考图 | 用 `gen_image` 出角色/道具/场景参考图 → `reference_images` 喂给视频（无专门 entity 工具，方法见 skill） |
+| 🎭 主体参考图 | 用 `gen_image` 出角色/道具/场景参考图 → 喂给视频当参考 |
 | 🎨 视觉生成 | `gen_image` / `gen_video_t2v` / `query_video_task` / `cancel_video_task` |
 | ✂️ 视频处理 | `video_concat` / `video_crossfade` / `video_trim` / `video_speed` / `video_overlay` / `video_fade` / `video_portrait` / `burn_subtitle` |
-| 🎵 音频 | `gen_audio_bgm` ⭐ / `query_audio_task` ⭐ / `audio_amix` / `tts` |
+| 🎵 音频 | `gen_audio_bgm` / `query_audio_task` / `audio_amix` / `tts` |
 | 👁️ 评估 | `vlm_understand`（导演视角审片，三场景模板）/ `extract_frames` |
 | 🧰 通用 | `code_run` / `file_read` / `file_write` / `file_patch` / `web_scan` / `web_execute_js` / `update_working_checkpoint` / `ask_user` / `start_long_term_update` |
 
-> 📌 分镜/状态查询**不再是独立工具**——分镜用通用 `file_write`/`file_read` 读写 `projects/<pid>/storyboard.json`，项目状态用 `file_read` 读 `manifest.json`。
-
-> 🆕 **导演视角的工具说明（人话版）见 [DIRECTOR_GUIDE.md](./DIRECTOR_GUIDE.md)**——每个工具干嘛、什么时候用、想改拍法改哪里。
-> 模型清单 / 目录结构 / 审计日志等硬事实已内联进 [assets/sys_prompt_film.txt](./assets/sys_prompt_film.txt) 的「事实参考卡」段。
+> 📌 分镜/状态查询**不再是独立工具**——分镜用通用工具读写 `storyboard.json`，项目状态读 `manifest.json`。
+> 🆕 **想了解工具怎么用？见 [DIRECTOR_GUIDE.md](./DIRECTOR_GUIDE.md)**。
 
 ---
 
 ## 🧠 设计原则
 
-- **决策 / 知识分层**："想下一步干嘛"的决策内核与"怎么拍片"的技能库彻底解耦——内核只管判断与循环，影视 know-how 全压进 `skills/` + sys_prompt + `film` 工具，互不污染
-- **自主判断，流程不钉死**：没有"必须 P1→P2→P3"的硬编排，agent 自己读经验、自己拿主意，根据 review 反馈随时跳回重做 / 跳过 / 换思路
-- **越用越聪明**：拍完蒸馏进分层记忆、踩坑写回 skill，下次开机自动加载——同一个坑不踩第二次（详见上文「自我进化」）
-- **导演视角自审**：VLM 不打分、不列维度、不写 QA 报告，按导演审美发散性评判
-- **VLM ≠ PE 工程师**：VLM 只出"问题诊断+想要的样子"，agent 走 PE 7 步翻译成工程化 prompt
-- **工具纯原子 + 文档层经验沉淀**：tool 只做纯 API 调用（不夹业务判断/编排 hint）；所有方法论、纪律、流程编排都沉淀进 skill md，由 agent 自觉遵守
-- **铁律 = 状态底线，不规定路线**：sys_prompt 只说"必须达到什么状态"（不偷砍 / 主体过审 / 产物过审 / 不脑补），不绑工具名/格式；**怎么实现是 skill 的事**——这样新增/替换实现路线（如九宫格并行）0 改 system 即可生效
-- **加 skill 0 代码生效**：在 `skills/` 下新建一个文件夹 + `SKILL.md`（对齐 Anthropic Agent Skills 标准：YAML frontmatter 写 `name` + `description`），开机自动进 SKILLS_INDEX
-- **小步快跑**：单次只出最小可验证产物，VLM 看一眼再扩张
-- **节约预算**：图编辑优先于重画，能并行就并行（链式承接除外）
-
-完整 sys_prompt 见 [assets/sys_prompt_film.txt](./assets/sys_prompt_film.txt)，业务方法论沉淀在 [skills/](./skills/) 下各 `skill_*/` 文件夹（每个文件夹一个 `SKILL.md`，对齐 Anthropic Agent Skills 标准：YAML frontmatter + 正文），通用 SOP（plan / review / vision 等）以平铺 `.md` 文件并存于同一目录。
+- **决策 / 知识分层**："想下一步干嘛"的内核与"怎么拍片"的技能库彻底解耦——内核只管判断与循环，影视经验全压进 `skills/` 文档和工具，互不污染。
+- **自主判断，流程不钉死**：没有死板的硬编排，Agent 自己读经验、自己拿主意，根据审片反馈随时跳回重做 / 跳过 / 换思路。
+- **越用越聪明**：拍完蒸馏进分层记忆、踩坑写回技能文档，下次开机自动加载——同一个坑不踩第二次。
+- **导演视角自审**：AI 不打分、不列维度、不写 QA 报告，按导演审美发散性评判。
+- **AI ≠ prompt 工程师**：AI 只出"问题诊断+想要的样子"，Agent 自己走 7 步翻译成模型能懂的工程化话术。
+- **加技能 0 代码生效**：在 `skills/` 下新建一个文件夹 + `SKILL.md`，开机自动加载。
+- **小步快跑**：单次只出最小可验证产物，AI 看一眼再扩张。
+- **节约预算**：图编辑优先于重画，能并行就并行（链式承接除外）。
 
 ---
 
 ## ❓ 常见问题
 
 **Q: 报 401 / 403**
-A: `mykey.py` 里 apikey 没填对，或对应模型没在火山方舟开通访问权限。
+A: `vibefilming.config.json` 里 `ark.api_key` 没填对，或对应模型没在火山方舟开通访问权限。
 
 **Q: BGM 报 200028 APINoSource**
 A: 火山 BigMusic 服务没开通。去 https://console.volcengine.com/ai-music 开通"音乐生成"服务即可。
@@ -251,23 +328,23 @@ A: 火山 BigMusic 服务没开通。去 https://console.volcengine.com/ai-music
 A: `setup.sh` 装的 `imageio-ffmpeg` 自带 ffmpeg。如还报错：`brew install ffmpeg`（macOS）/ `apt install ffmpeg`（Linux）。
 
 **Q: 视频任务长时间不返回**
-A: Seedance 单段 200-300s 是正常的。`query_video_task` 最多阻塞 5 分钟，超时可重试。
+A: 视频模型单段 200-300s 是正常的。查询状态最多阻塞 5 分钟，超时可重试。
 
-**Q: agent 卡住没反应**
+**Q: Agent 卡住没反应**
 A: `Ctrl+C` 重启即可。项目状态都在 `projects/<id>/manifest.json`，不会丢。
 
-**Q: 想换 LLM（不用豆包）**
-A: 编辑 [mykey.py](./mykey.py)，通用模板见 [mykey_template.py](./mykey_template.py)。**但生图/生视频/VLM 必须用豆包**（代码里写死了模型 ID）。
+**Q: 想换思考模型**
+A: 编辑 `vibefilming.config.json` 里的 `ark.models.text`。生图 / 生视频 / AI 审片也分别可以通过对应配置切换。
 
 ---
 
-## 🎮 REPL 控制命令
+## 🎮 控制台命令
 
 | 命令 | 说明 |
 |---|---|
 | `/new` | 开新对话清空上下文（项目文件保留） |
 | `/continue` | 列出可恢复的会话快照 |
-| `/llm` | 切换 LLM session |
+| `/llm` | 切换大模型 |
 | `/session.temperature=0.3` | 临时调采样温度 |
 | `/exit` | 退出 |
 
@@ -278,18 +355,18 @@ A: 编辑 [mykey.py](./mykey.py)，通用模板见 [mykey_template.py](./mykey_t
 | 文档 | 内容 |
 |---|---|
 | [DIRECTOR_GUIDE.md](./DIRECTOR_GUIDE.md) | 🆕 **导演手册（人话版）**：36 个工具说明 + 想改拍法去哪改 + 0 代码加新技能 |
-| [skill_prompt_engineering](./skills/skill_prompt_engineering/SKILL.md) | PE 7 步 + 5 大死罪 + 4 类符号实战 |
-| [skill_director_vlm](./skills/skill_director_vlm/SKILL.md) | VLM 当导演的三场景审片模板 |
+| [skill_prompt_engineering](./skills/skill_prompt_engineering/SKILL.md) | 7 步 prompt 工程 + 5 大死罪 + 4 类符号实战 |
+| [skill_director_vlm](./skills/skill_director_vlm/SKILL.md) | AI 当导演的三场景审片模板 |
 | [skill_entity_consistency](./skills/skill_entity_consistency/SKILL.md) | 角色一致性 / 三视图 / 防 ID 漂移 |
 | [skill_video_chain](./skills/skill_video_chain/SKILL.md) | 链式衔接 / 帧裁剪 / 防画质劣化 |
-| [skill_storyboard](./skills/skill_storyboard/SKILL.md) | 分镜设计 / entities_planned 必填 / **并行 or 链式出片路线选择 + 关键帧并行法** |
+| [skill_storyboard](./skills/skill_storyboard/SKILL.md) | 分镜设计 / 并行或链式出片路线选择 |
 
 ---
 
 <div align="center">
 
-**🎬 让 AI 当导演，让导演只说一句话。**
+**🎬 让 AI 当导演，让你只说一句话。**
 
-⭐ 觉得有用，给个 Star 支持一下
+⭐ 觉得有用，给个 Star 支持一下 ⭐
 
 </div>

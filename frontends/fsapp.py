@@ -1,4 +1,4 @@
-import argparse, asyncio, importlib.util, json, os, queue as Q, re, sys, threading, time, uuid
+import argparse, asyncio, json, os, queue as Q, re, sys, threading, time
 from pathlib import Path
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,33 +35,29 @@ def _load_dict_config(path):
     if not path.exists():
         return None
     try:
-        if path.suffix == ".py":
-            mod_name = f"_fs_mykey_{uuid.uuid4().hex}"
-            spec = importlib.util.spec_from_file_location(mod_name, path)
-            if not spec or not spec.loader:
-                return None
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            data = {k: v for k, v in vars(module).items() if not k.startswith("_")}
-        else:
-            with open(path, encoding="utf-8") as f:
-                data = json.load(f)
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict) and isinstance(data.get("feishu"), dict):
+            feishu = data["feishu"]
+            data = {
+                **data,
+                "fs_app_id": feishu.get("app_id", ""),
+                "fs_app_secret": feishu.get("app_secret", ""),
+                "fs_allowed_users": feishu.get("allowed_users", []),
+            }
         return data if isinstance(data, dict) else None
     except Exception as e:
         print(f"[ERROR] load config failed {path}: {e}")
         return None
 
 
-def _resolve_mykey_path():
+def _resolve_config_path():
     workspace_root = _workspace_root_dir()
     config_root = _workspace_config_dir(workspace_root)
     candidates = [
-        config_root / "mykey.json",
-        config_root / "mykey.py",
-        workspace_root / "mykey.json",
-        workspace_root / "mykey.py",
-        Path(PROJECT_ROOT) / "mykey.json",
-        Path(PROJECT_ROOT) / "mykey.py",
+        config_root / "vibefilming.config.json",
+        workspace_root / "vibefilming.config.json",
+        Path(PROJECT_ROOT) / "vibefilming.config.json",
     ]
     for candidate in candidates:
         if _load_dict_config(candidate):
@@ -330,14 +326,14 @@ agent_lock = threading.Lock()
 
 
 def _load_config():
-    path = _resolve_mykey_path()
+    path = _resolve_config_path()
     if not path or not path.exists():
         return {}, str(path or "")
     try:
         data = _load_dict_config(path)
         return data if isinstance(data, dict) else {}, str(path)
     except Exception as e:
-        print(f"[ERROR] load mykey failed {path}: {e}")
+        print(f"[ERROR] load config failed {path}: {e}")
         return {}, str(path)
 
 
@@ -848,7 +844,7 @@ def main():
     global client, APP_ID, APP_SECRET, ALLOWED_USERS, PUBLIC_ACCESS, CONFIG_PATH
     APP_ID, APP_SECRET, ALLOWED_USERS, PUBLIC_ACCESS, CONFIG_PATH = _feishu_config()
     if not APP_ID or not APP_SECRET:
-        print(f"错误: 请在 mykey 配置中填写 fs_app_id 和 fs_app_secret\n配置文件: {CONFIG_PATH}", flush=True)
+        print(f"错误: 请在 vibefilming.config.json 中填写 feishu.app_id 和 feishu.app_secret\n配置文件: {CONFIG_PATH}", flush=True)
         sys.exit(1)
     handler = lark.EventDispatcherHandler.builder("", "").register_p2_im_message_receive_v1(handle_message).build()
     retry_delay = 5

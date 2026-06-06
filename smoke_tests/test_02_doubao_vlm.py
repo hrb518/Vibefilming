@@ -24,7 +24,7 @@ def main():
     banner("Test 2: Doubao VLM 视觉理解")
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return False
 
     image_url = _load_image_inline()

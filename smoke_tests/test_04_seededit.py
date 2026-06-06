@@ -18,7 +18,7 @@ def main():
     banner("Test 4: SeedEdit 图编辑")
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return False
 
     # 优先使用 Test 3 缓存的 Seedream URL（在火山 TOS 上，最稳）

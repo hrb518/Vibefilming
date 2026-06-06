@@ -48,7 +48,7 @@ def main():
     banner("Test 5: Seedance 文生视频（仅验证任务提交 + 一次状态查询）")
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return False
 
     last_err = None

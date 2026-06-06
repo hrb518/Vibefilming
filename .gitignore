@@ -27,7 +27,7 @@ auth.json
 model_responses.txt
 
 # Sensitive files (API keys, credentials)
-mykey.py
+vibefilming.config.json
 
 tasks/
 

@@ -12,7 +12,7 @@ def main():
     sk = get_extra("VOLC_SK")
 
     if not ak or not sk:
-        fail("缺少 VOLC_AK / VOLC_SK —— GenBGM 走火山引擎签名（AK/SK），需到「访问控制」生成密钥")
+        fail("缺少 volc.ak / volc.sk —— GenBGM 走火山引擎签名（AK/SK），需到「访问控制」生成密钥")
         info("文档：https://www.volcengine.com/docs/6489/")
         return False
 

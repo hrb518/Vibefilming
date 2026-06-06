@@ -39,16 +39,16 @@ echo "==> 3/4 安装依赖"
     "imageio-ffmpeg>=0.4"
 echo "    依赖装好"
 
-echo "==> 4/4 检查 mykey.py"
-if [ ! -f "mykey.py" ]; then
-    cp mykey.example.py mykey.py
-    echo "[!] 已生成 mykey.py 模板，请编辑填入你的 ARK API key"
+echo "==> 4/4 检查 vibefilming.config.json"
+if [ ! -f "vibefilming.config.json" ]; then
+    cp vibefilming.config.example.json vibefilming.config.json
+    echo "[!] 已生成 vibefilming.config.json 模板，请编辑填入你的 ARK API key"
     echo "    然后运行：source .venv/bin/activate && python3 agentmain.py"
     exit 0
 fi
 
-if grep -q "ark-XXXXXXXX" mykey.py; then
-    echo "[!] mykey.py 里 apikey 还没填，请先编辑"
+if grep -q "ark-XXXXXXXX" vibefilming.config.json; then
+    echo "[!] vibefilming.config.json 里 ark.api_key 还没填，请先编辑"
     echo "    然后运行：source .venv/bin/activate && python3 agentmain.py"
     exit 0
 fi

@@ -8,7 +8,7 @@ def main():
     banner("Test 1: Doubao 文本对话 (doubao-seed-2-0-pro)")
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return False
 
     url = f"{get_ark_base()}/chat/completions"

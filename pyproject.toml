@@ -2,9 +2,9 @@
 # minimal core first; missing packages can be installed on demand.
 
 [project]
-name = "genericagent"
+name = "vibefilming"
 version = "0.1.0"
-description = "Minimalist self-evolving autonomous agent framework"
+description = "AI film director agent for autonomous short video production"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 license = { text = "MIT" }
@@ -18,25 +18,12 @@ dependencies = [
 
 [project.optional-dependencies]
 # select extras, not all. match current task/env.
-# examples: .[ui] for GUI, bot deps only if bot needed.
+# examples: install .[feishu] only when the Feishu bot frontend is needed.
 ui = [
-    "streamlit>=1.28",
-    "pywebview>=4.0",
-    "textual>=0.70",
-    # tui_v3 (scrollback-first TUI) — prompt_toolkit replaces textual; rich is
-    # now a direct dependency (was transitive via textual in tui_v2).
-    "prompt_toolkit>=3.0,<4",
-    "rich>=13.0",
     "pillow>=9.0",
 ]
-all-frontends = [
-    "python-telegram-bot>=20.0",
-    "qq-botpy>=1.0",
-    "pycryptodome>=3.19",
-    "qrcode>=7.4",
+feishu = [
     "lark-oapi>=1.0",
-    "wecom-aibot-sdk>=1.0",
-    "dingtalk-stream>=0.20",
 ]
 
 [build-system]
@@ -48,4 +35,4 @@ py-modules = []
 packages = ["ga_cli"]
 
 [project.scripts]
-ga = "ga_cli.cli:main"
+vibefilming = "ga_cli.cli:main"

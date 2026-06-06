@@ -1,6 +1,6 @@
 """Test 6: 豆包大模型 TTS（HTTP 一次性接口）。
 
-需要在 keys_extra.py 中填 TTS_APP_ID / TTS_ACCESS_TOKEN。
+需要在 vibefilming.config.json 中填 tts.app_id / tts.access_token。
 没填则跳过并报告"缺凭证"。
 """
 import json
@@ -18,7 +18,7 @@ def main():
     voice = get_extra("TTS_VOICE", "BV001_streaming")
 
     if not app_id or not token:
-        fail("缺少 TTS_APP_ID / TTS_ACCESS_TOKEN —— 请到「火山引擎控制台 → 语音技术 → 大模型语音合成」开通后，填到 smoke_tests/keys_extra.py")
+        fail("缺少 tts.app_id / tts.access_token —— 请到「火山引擎控制台 → 语音技术 → 大模型语音合成」开通后，填到 vibefilming.config.json")
         return False
 
     url = "https://openspeech.bytedance.com/api/v1/tts"

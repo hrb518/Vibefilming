@@ -1,57 +1,63 @@
 """共享配置与工具函数。
 
-凭证读取顺序：
-1. 环境变量
-2. 仓库根目录下的 mykey.py（已存在的 ARK key 自动复用）
-3. 本目录下的 keys_extra.py（可选，用于 TTS/VOD/GenBGM 等）
+凭证统一读取仓库根目录下的 vibefilming.config.json。
 """
-import os
-import sys
 import json
 import time
-import importlib.util
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+CONFIG_JSON = ROOT / "vibefilming.config.json"
 OUT_DIR = Path(__file__).resolve().parent / "outputs"
 OUT_DIR.mkdir(exist_ok=True)
 
 
-def _load_module(path: Path, name: str):
-    if not path.exists():
-        return None
-    spec = importlib.util.spec_from_file_location(name, str(path))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+def _load_config() -> dict:
+    if not CONFIG_JSON.exists():
+        return {}
+    return json.loads(CONFIG_JSON.read_text(encoding="utf-8"))
 
 
-_mykey = _load_module(ROOT / "mykey.py", "mykey")
-_extra = _load_module(Path(__file__).resolve().parent / "keys_extra.py", "keys_extra")
+_config = _load_config()
+
+
+def _config_get(*path, default=None):
+    cur = _config
+    for key in path:
+        if not isinstance(cur, dict) or key not in cur:
+            return default
+        cur = cur[key]
+    return cur
 
 
 def get_ark_key() -> str:
     return (
-        os.environ.get("ARK_API_KEY")
-        or (getattr(_mykey, "native_oai_config", {}).get("apikey") if _mykey else None)
+        _config_get("ark", "api_key", default="")
         or ""
     )
 
 
 def get_ark_base() -> str:
     return (
-        os.environ.get("ARK_API_BASE")
-        or (getattr(_mykey, "native_oai_config", {}).get("apibase") if _mykey else None)
+        _config_get("ark", "api_base", default="")
         or "https://ark.cn-beijing.volces.com/api/v3"
     )
 
 
 def get_extra(name: str, default=None):
-    """读取额外凭证：先环境变量，再 keys_extra.py"""
-    if name in os.environ:
-        return os.environ[name]
-    if _extra and hasattr(_extra, name):
-        return getattr(_extra, name)
+    """读取额外凭证：统一来自 vibefilming.config.json。"""
+    mapping = {
+        "VOLC_AK": ("volc", "ak"),
+        "VOLC_SK": ("volc", "sk"),
+        "VOD_AK": ("volc", "ak"),
+        "VOD_SK": ("volc", "sk"),
+        "TTS_APP_ID": ("tts", "app_id"),
+        "TTS_ACCESS_TOKEN": ("tts", "access_token"),
+        "TTS_CLUSTER": ("tts", "cluster"),
+        "TTS_VOICE": ("tts", "voice"),
+    }
+    if name in mapping:
+        return _config_get(*mapping[name], default=default)
     return default
 
 

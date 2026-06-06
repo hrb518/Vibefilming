@@ -19,65 +19,74 @@ import urllib.request
 from pathlib import Path
 from typing import Optional
 
-# ============== 凭证读取（与 smoke_tests/_common.py 行为一致） ==============
+# ============== 配置读取 ==============
 ROOT = Path(__file__).resolve().parent.parent
+CONFIG_JSON = ROOT / "vibefilming.config.json"
 
 
-def _load_module(path: Path, name: str):
-    if not path.exists():
-        return None
-    import importlib.util
-    spec = importlib.util.spec_from_file_location(name, str(path))
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
+def _load_json_config() -> dict:
+    if not CONFIG_JSON.exists():
+        return {}
+    try:
+        return json.loads(CONFIG_JSON.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
 
 
-_mykey = _load_module(ROOT / "mykey.py", "_film_mykey")
-_extra = _load_module(ROOT / "smoke_tests" / "keys_extra.py", "_film_keys_extra")
+_config = _load_json_config()
+
+
+def _config_get(*path, default=None):
+    cur = _config
+    for key in path:
+        if not isinstance(cur, dict) or key not in cur:
+            return default
+        cur = cur[key]
+    return cur
 
 
 def get_ark_key() -> str:
     return (
-        os.environ.get("ARK_API_KEY")
-        or (getattr(_mykey, "native_oai_config", {}).get("apikey") if _mykey else "")
+        _config_get("ark", "api_key", default="")
         or ""
     )
 
 
 def get_ark_base() -> str:
     return (
-        os.environ.get("ARK_API_BASE")
-        or (getattr(_mykey, "native_oai_config", {}).get("apibase") if _mykey else "")
+        _config_get("ark", "api_base", default="")
         or "https://ark.cn-beijing.volces.com/api/v3"
     )
 
 
 def get_extra(name: str, default=None):
-    if name in os.environ:
-        return os.environ[name]
-    if _extra and hasattr(_extra, name):
-        return getattr(_extra, name)
-    # 兜底：从 mykey.py 的 volc_open_api_config 读 VOLC_AK / VOLC_SK
-    if _mykey:
-        cfg = getattr(_mykey, "volc_open_api_config", None)
-        if isinstance(cfg, dict) and name in cfg:
-            return cfg[name]
+    config_key = {"VOLC_AK": "ak", "VOLC_SK": "sk"}.get(name)
+    if config_key:
+        value = _config_get("volc", config_key, default=None)
+        if value:
+            return value
     return default
 
 
+def get_model(name: str, default: str) -> str:
+    return (
+        _config_get("ark", "models", name, default="")
+        or default
+    )
+
+
 # ============== 模型 ID（可统一改） ==============
-MODEL_TEXT = "doubao-seed-2-0-pro-260215"
-MODEL_VLM = "doubao-seed-2-0-pro-260215"
-MODEL_IMG = "doubao-seedream-4-5-251128"
-MODEL_VIDEO = "doubao-seedance-2-0-260128"  # 标准版（已弃用 fast 档）
+MODEL_TEXT = get_model("text", "doubao-seed-2-0-pro-260215")
+MODEL_VLM = get_model("vlm", "doubao-seed-2-0-pro-260215")
+MODEL_IMG = get_model("image", "doubao-seedream-4-5-251128")
+MODEL_VIDEO = get_model("video", "doubao-seedance-2-0-260128")  # 标准版（已弃用 fast 档）
 
 
 # ============== HTTP helper ==============
 def _http_post(url: str, body: dict, timeout: int = 180) -> dict:
     key = get_ark_key()
     if not key:
-        raise RuntimeError("ARK_API_KEY 未配置（mykey.py 或环境变量）")
+        raise RuntimeError("ARK API key 未配置：请在 vibefilming.config.json 中填写 ark.api_key")
     req = urllib.request.Request(
         url, data=json.dumps(body).encode(),
         headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
@@ -243,7 +252,7 @@ def gen_image(prompt: str, save_path: Path,
     raw = _http_post(f"{get_ark_base()}/images/generations", body)
     url = raw["data"][0]["url"]
     p = _download(url, Path(save_path))
-    return {"url": url, "path": str(p), "raw": raw}
+    return {"url": url, "path": str(p), "raw": raw, "body": body}
 
 
 # ============== Seedance（异步） ==============
@@ -302,7 +311,7 @@ def submit_video_task(prompt: str,
     if camera_fixed is not None:
         body["camera_fixed"] = bool(camera_fixed)
     raw = _http_post(f"{get_ark_base()}/contents/generations/tasks", body)
-    return {"task_id": raw.get("id"), "model": MODEL_VIDEO, "raw": raw}
+    return {"task_id": raw.get("id"), "model": MODEL_VIDEO, "raw": raw, "body": body}
 
 
 def query_video_task(task_id: str) -> dict:
@@ -585,7 +594,7 @@ def tts(text: str, save_path: Path, voice: str = "default") -> dict:
         raise RuntimeError(
             "TTS 凭证缺失：请到 https://console.volcengine.com/speech 开通"
             "「大模型语音合成」，把 TTS_APP_ID / TTS_TOKEN 填到 "
-            "smoke_tests/keys_extra.py（拷贝自 keys_extra.example.py）"
+            "vibefilming.config.json"
         )
     raise NotImplementedError("TTS 实现待补：参考 smoke_tests/test_06_tts.py")
 
@@ -662,7 +671,7 @@ def _volc_call(action: str, body: Optional[dict],
     if not (ak and sk):
         raise RuntimeError(
             "GenBGM 凭证缺失：请到 https://console.volcengine.com/iam/keymanage "
-            "新建 AK/SK，把 VOLC_AK / VOLC_SK 填到 smoke_tests/keys_extra.py"
+            "新建 AK/SK，把 volc.ak / volc.sk 填到 vibefilming.config.json"
         )
     host = "open.volcengineapi.com"
     query = {"Action": action, "Version": version}
@@ -753,7 +762,7 @@ def submit_bgm_task(prompt: str,
     task_id = submit.get("Result", {}).get("TaskID")
     if not task_id:
         raise RuntimeError(f"GenBGM 提交未返回 TaskID: {submit}")
-    return {"task_id": task_id, "raw": submit}
+    return {"task_id": task_id, "raw": submit, "body": body}
 
 
 def query_bgm_task(task_id: str, save_path: Optional[Path] = None) -> dict:

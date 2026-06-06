@@ -1,38 +1,74 @@
-import os, json, re, time, requests, sys, threading, urllib3, base64, importlib, uuid
+import os, json, re, time, requests, sys, threading, urllib3, base64, uuid
 from datetime import datetime
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 _RESP_CACHE_KEY = str(uuid.uuid4())
 _ROOT = os.path.dirname(os.path.abspath(__file__))
 if _ROOT not in sys.path: sys.path.append(_ROOT)
+CONFIG_JSON = os.path.join(_ROOT, 'vibefilming.config.json')
 
-def _load_mykeys():
-    global _mykey_path
-    try:
-        import mykey; importlib.reload(mykey); _mykey_path = mykey.__file__
-        return {k: v for k, v in vars(mykey).items() if not k.startswith('_')}
-    except ImportError as e:
-        if getattr(e, 'name', None) != 'mykey':
-            raise Exception(f'[ERROR] mykey.py found but failed to import: {e}') from e
-    except SyntaxError as e:
-        raise Exception(f'[ERROR] mykey.py has syntax error: {e}') from e
-    p = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mykey.json')
-    if not os.path.exists(p): raise Exception('[ERROR] mykey.py not found in sys.path and mykey.json not found. Run "python configure_mykey.py" or copy mykey_template.py to mykey.py and fill in your keys.')
-    with open(_mykey_path := p, encoding='utf-8') as f: return json.load(f)
+def _load_json_file(path):
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
 
-_mykey_path = _mykey_mtime = None
-def reload_mykeys():
-    global _mykey_mtime
+def _runtime_config_from_json(cfg):
+    """Convert vibefilming.config.json to the internal LLM session config."""
+    if not isinstance(cfg, dict):
+        return {}
+    ark = cfg.get('ark') if isinstance(cfg.get('ark'), dict) else {}
+    feishu = cfg.get('feishu') if isinstance(cfg.get('feishu'), dict) else {}
+    models = ark.get('models') if isinstance(ark.get('models'), dict) else {}
+    api_key = ark.get('api_key')
+    out = {}
+    if api_key:
+        out['native_oai_config'] = {
+            'name': 'doubao',
+            'apikey': api_key,
+            'apibase': ark.get('api_base') or 'https://ark.cn-beijing.volces.com/api/v3',
+            'model': models.get('text') or 'doubao-seed-2-0-pro-260215',
+            'api_mode': 'chat_completions',
+            'max_retries': 3,
+            'connect_timeout': 10,
+            'read_timeout': 120,
+            'context_win': 24000,
+        }
+        out['mixin_config'] = {
+            'llm_nos': ['doubao'],
+            'max_retries': 5,
+            'base_delay': 0.5,
+        }
+    if feishu.get('app_id'):
+        out['fs_app_id'] = feishu.get('app_id')
+    if feishu.get('app_secret'):
+        out['fs_app_secret'] = feishu.get('app_secret')
+    if 'allowed_users' in feishu:
+        out['fs_allowed_users'] = feishu.get('allowed_users') or []
+    return out
+
+def _load_runtime_config():
+    global _config_path
+    cfg = _load_json_file(CONFIG_JSON)
+    if cfg is not None:
+        _config_path = CONFIG_JSON
+        return _runtime_config_from_json(cfg)
+    raise Exception('[ERROR] config not found. Copy vibefilming.config.example.json to vibefilming.config.json and fill in your ARK API key.')
+
+_config_path = _config_mtime = None
+def reload_runtime_config():
+    global _config_mtime
     try:
-        mt = os.stat(_mykey_path).st_mtime_ns if _mykey_path else -1
-        if mt == _mykey_mtime: return globals().get('mykeys', {}), False
-        mk = _load_mykeys(); _mykey_mtime = os.stat(_mykey_path).st_mtime_ns
-        print(f'[Info] Load mykeys from {_mykey_path}')
-        globals().update(mykeys=mk)
+        mt = os.stat(_config_path).st_mtime_ns if _config_path else -1
+        if mt == _config_mtime: return globals().get('runtime_config', {}), False
+        mk = _load_runtime_config()
+        _config_mtime = os.stat(_config_path).st_mtime_ns if _config_path else -1
+        print(f'[Info] Load runtime config from {_config_path}')
+        globals().update(runtime_config=mk)
         return mk, True
-    except: return globals().get('mykeys', {}), False
+    except: return globals().get('runtime_config', {}), False
 
 def __getattr__(name):  # once guard in PEP 562
-    if name == 'mykeys': return reload_mykeys()[0]
+    if name == 'runtime_config': return reload_runtime_config()[0]
     raise AttributeError(f"module 'llmcore' has no attribute {name}")
 
 def compress_history_tags(messages, keep_recent=10, max_len=800, force=False, interval=5):
@@ -313,6 +349,47 @@ def _record_usage(usage, api_mode):
     elif api_mode == 'messages':
         ci, cr, inp = usage.get("cache_creation_input_tokens", 0), usage.get("cache_read_input_tokens", 0), usage.get("input_tokens", 0)
         print(f"[Cache] input={inp} creation={ci} read={cr}")
+
+def _log_llm_api_call(sess, url, payload, *, status_code=None, response_body=None, error=None,
+                      attempt=0, started_at=None):
+    """把 Agent 主循环自己的 LLM API 调用写进当前 film project 的 model_calls.jsonl。
+
+    film 工具层会记录 Seedream/Seedance/VLM/BGM 等工具调用；这里补的是 agent 本体
+    每一轮思考、选工具时对文本模型的调用。
+    """
+    try:
+        from film import workspace as ws
+        pid = ws.get_active_project()
+        if not pid:
+            return
+        model = (payload or {}).get("model") or getattr(sess, "model", "")
+        started_at = started_at or time.time()
+        detail = {
+            "via_tool": "__agent_llm__",
+            "session_name": getattr(sess, "name", None),
+            "model": model,
+            "api_mode": getattr(sess, "api_mode", None),
+            "url": url,
+            "status_code": status_code,
+            "stream": bool((payload or {}).get("stream")),
+            "attempt": attempt,
+            "duration_ms": int((time.time() - started_at) * 1000),
+        }
+        if error:
+            detail["error"] = str(error)
+        ws.log_model_call(
+            pid,
+            model or "agent_llm",
+            detail,
+            raw_request={
+                "method": "POST",
+                "url": url,
+                "body": payload,
+            },
+            raw_response=response_body,
+        )
+    except Exception:
+        pass
     
 def _parse_openai_json(data, api_mode="chat_completions"):
     blocks = []
@@ -365,6 +442,7 @@ def _stream_with_retry(sess, url, headers, payload, parse_fn):
         return max(0.5, ra if ra is not None else min(30.0, 1.5 * (2 ** attempt)))
     for attempt in range(sess.max_retries + 1):
         streamed = False
+        started_at = time.time()
         try:
             with requests.post(url, headers=headers, json=payload, stream=sess.stream, 
                                timeout=(sess.connect_timeout, sess.read_timeout), proxies=sess.proxies, verify=sess.verify) as r:
@@ -372,26 +450,66 @@ def _stream_with_retry(sess, url, headers, payload, parse_fn):
                     if r.status_code in _RETRYABLE and attempt < sess.max_retries:
                         d = _delay(r, attempt)
                         print(f"[LLM Retry] HTTP {r.status_code}, retry in {d:.1f}s ({attempt+1}/{sess.max_retries+1})")
+                        _log_llm_api_call(sess, url, payload, status_code=r.status_code,
+                                          response_body={"error": r.text[:4000]},
+                                          attempt=attempt, started_at=started_at)
                         time.sleep(d); continue
                     try: body = r.text.strip()[:500]
                     except: body = ""
                     err = f"!!!Error: HTTP {r.status_code}" + (f": {body}" if body else "")
+                    _log_llm_api_call(sess, url, payload, status_code=r.status_code,
+                                      response_body={"error": body},
+                                      error=err, attempt=attempt, started_at=started_at)
                     yield err; return [{"type": "text", "text": err}]
-                gen = parse_fn(r)
+                captured = {"sse_lines": [], "json": None}
+                class _LoggedResponse:
+                    def __init__(self, resp):
+                        self._resp = resp
+                    def __getattr__(self, name):
+                        return getattr(self._resp, name)
+                    def iter_lines(self, *args, **kwargs):
+                        for line in self._resp.iter_lines(*args, **kwargs):
+                            if line:
+                                try:
+                                    captured["sse_lines"].append(line.decode("utf-8", "ignore") if isinstance(line, bytes) else str(line))
+                                except Exception:
+                                    pass
+                            yield line
+                    def json(self, *args, **kwargs):
+                        data = self._resp.json(*args, **kwargs)
+                        captured["json"] = data
+                        return data
+
+                gen = parse_fn(_LoggedResponse(r))
                 try:
                     while True: streamed = True; yield next(gen)
                 except StopIteration as e:
                     if not e.value and not streamed: raise requests.ConnectionError("empty response")
-                    return e.value or []
+                    blocks = e.value or []
+                    raw_body = {"content_blocks": blocks}
+                    if captured["json"] is not None:
+                        raw_body["json"] = captured["json"]
+                    if captured["sse_lines"]:
+                        raw_body["sse_lines"] = captured["sse_lines"]
+                    _log_llm_api_call(sess, url, payload, status_code=r.status_code,
+                                      response_body=raw_body,
+                                      attempt=attempt, started_at=started_at)
+                    return blocks
         except (requests.Timeout, requests.ConnectionError) as e:
             err = f"!!!Error: {type(e).__name__}"
             if attempt < sess.max_retries:
                 d = _delay(None, attempt)
                 print(f"[LLM Retry] {type(e).__name__}, retry in {d:.1f}s ({attempt+1}/{sess.max_retries+1})")
+                _log_llm_api_call(sess, url, payload, error=err,
+                                  attempt=attempt, started_at=started_at)
                 yield err; time.sleep(d); continue
+            _log_llm_api_call(sess, url, payload, error=err,
+                              attempt=attempt, started_at=started_at)
             yield err; return [{"type": "text", "text": err}]
         except Exception as e:
             err = f"\n\n[!!! 流异常中断 {type(e).__name__}: {e} !!!]" if streamed else f"!!!Error: {type(e).__name__}: {e}"
+            _log_llm_api_call(sess, url, payload, error=err,
+                              attempt=attempt, started_at=started_at)
             yield err; return [{"type": "text", "text": err}]
 
 def _openai_stream(sess, messages):
@@ -1059,8 +1177,8 @@ class NativeToolClient:
         return resp
 
 def resolve_session(cfg_name):
-    cfg = reload_mykeys()[0].get(cfg_name)
-    if not cfg: raise ValueError(f"Config '{cfg_name}' not in mykey")
+    cfg = reload_runtime_config()[0].get(cfg_name)
+    if not cfg: raise ValueError(f"Config '{cfg_name}' not in vibefilming.config.json")
     if 'native' in cfg_name: return (NativeClaudeSession if 'claude' in cfg_name else NativeOAISession)(cfg=cfg)
     if 'claude' in cfg_name: return ClaudeSession(cfg=cfg)
     return LLMSession(cfg=cfg) if 'oai' in cfg_name else None

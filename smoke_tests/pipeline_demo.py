@@ -381,7 +381,7 @@ def main():
 
     key = get_ark_key()
     if not key:
-        fail("缺少 ARK_API_KEY")
+        fail("缺少 ark.api_key")
         return 1
 
     storyboard, entity_url, keyframes, clips, final, review = (None,) * 6
